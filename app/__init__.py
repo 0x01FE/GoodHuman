@@ -34,7 +34,8 @@ def getGroupIOwn():
         data = try_parse_json(request)
         headers = request.headers
         cur.execute("SELECT group_id FROM members WHERE user_name = ?", [headers['user_name']])
-        db_data = cur.fetchone().split(',')
+        db_data = cur.fetchone()
+        db_data = db_data.split(",")
         response = app.response_class(
             response=json.dumps({"group_id":str(db_data[0])}),
             status=200,
@@ -50,7 +51,8 @@ def getMyGroups():
         data = try_parse_json(request)
         headers = request.headers
         cur.execute("SELECT group_id FROM members WHERE user_name = ?", [headers['user_name']])
-        db_data = cur.fetchone().split(',')
+        db_data = cur.fetchone()
+        db_data = db_data.split(',')
         db_data.pop(0)
         response = app.response_class(
             response=json.dumps({"group_id":db_data}),
@@ -66,7 +68,6 @@ def joinGroup():
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
-        cur.execute(f"SELECT group_id FROM members WHERE user_name = ?", [headers['user_name']])
         db_data = cur.fetchone()
         db_data = db_data + f",{str(data['group_id'])}"
         cur.execute("UPDATE members SET group_id = ? WHERE user_name = ?", [db_data, headers['user_name']])
