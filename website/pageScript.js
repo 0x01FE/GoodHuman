@@ -89,7 +89,7 @@ async function switchToUserScreen() {
     // }
     
     const userInfoTextElm = document.getElementById("userInfoText");
-    userInfoTextElm.innerHTML = `${username} - ${myPoints} points`;
+    userInfoTextElm.innerHTML = `${user_name} - 0 points`;
     
     const task_container = document.getElementById("task_container");
     
