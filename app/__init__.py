@@ -1,21 +1,27 @@
-from flask import Flask, jsonify, request
+from flask import Flask, request, jsonify, make_response
+from flask_cors import CORS
 import sqlite3 as sql
-import  json
+import json
 from datetime import datetime
-# datetime.now().strftime("%H:%M")
 
+# datetime.now().strftime("%H:%M")
 #DB = sqlite3.connect("goodhuman.db", check_same_thread=False)
 #CUR = DB.cursor()
 
 app = Flask(__name__)
+CORS(app)
 
-# MEMBERS
+def try_parse_json(req):
+    try:
+        return req.get_json()
+    except Exception:
+        return {}
 
 @app.route('/members/add', methods=['POST'])
 def createUser():
     with sql.connect("goodhuman.db") as con:
         cur = con.cursor()
-        data = request.get_json()
+        data = try_parse_json(request)
         headers = request.headers
         cur.execute("INSERT INTO members VALUES (?, ?, ?, NULL)", [headers['user_name'], headers['user_pass'], data['group_id']])
         con.commit()
@@ -25,9 +31,9 @@ def createUser():
 def getGroupIOwn():
     with sql.connect("goodhuman.db") as con:
         cur = con.cursor()
-        data = request.get_json()
+        data = try_parse_json(request)
         headers = request.headers
-        cur.execute("SELECT group_id WHERE user_name = ?", [headers['user_name']])
+        cur.execute("SELECT group_id FROM members WHERE user_name = ?", [headers['user_name']])
         db_data = cur.fetchone().split(',')
         response = app.response_class(
             response=json.dumps({"group_id":str(db_data[0])}),
@@ -41,9 +47,9 @@ def getGroupIOwn():
 def getMyGroups():
     with sql.connect("goodhuman.db") as con:
         cur = con.cursor()
-        data = request.get_json()
+        data = try_parse_json(request)
         headers = request.headers
-        cur.execute("SELECT group_id WHERE user_name = ?", [headers['user_name']])
+        cur.execute("SELECT group_id FROM members WHERE user_name = ?", [headers['user_name']])
         db_data = cur.fetchone().split(',')
         db_data.pop(0)
         response = app.response_class(
@@ -58,9 +64,9 @@ def getMyGroups():
 def joinGroup():
     with sql.connect("goodhuman.db") as con:
         cur = con.cursor()
-        data = request.get_json()
+        data = try_parse_json(request)
         headers = request.headers
-        cur.execute(f"SELECT group_id WHERE user_name = ?", [headers['user_name']])
+        cur.execute(f"SELECT group_id FROM members WHERE user_name = ?", [headers['user_name']])
         db_data = cur.fetchone()
         db_data = db_data + f",{str(data['group_id'])}"
         cur.execute("UPDATE members SET group_id = ? WHERE user_name = ?", [db_data, headers['user_name']])
@@ -75,7 +81,7 @@ def joinGroup():
 def getUserCurrency():
     with sql.connect("goodhuman.db") as con:
         cur = con.cursor()
-        data = request.get_json()
+        data = try_parse_json(request)
         headers = request.headers
         cur.execute("SELECT currency_ammount FROM members WHERE user_name = ?", [headers['user_name']])
         currency = cur.fetchone()
@@ -91,7 +97,7 @@ def getUserCurrency():
 def setUserCurrency():
     with sql.connect("goodhuman.db") as con:
         cur = con.cursor()
-        data = request.get_json()
+        data = try_parse_json(request)
         headers = request.headers
         cur.execute("UPDATE members SET currency_ammount = ? WHERE user_name = ?", [data['points'], data['user_name']])
         con.commit()
@@ -112,7 +118,7 @@ def addUserCurrency(user_name,ammount):
 def submitTask():
     with sql.connect("goodhuman.db") as con:
         cur = con.cursor()
-        data = request.get_json()
+        data = try_parse_json(request)
         headers = request.headers
         time_now = datetime.now().strftime("%H:%M")
         cur.execute("UPDATE tasks SET image = ?, user_name = ?, pending = 1, submit_time = ? WHERE task_name = ?", [data['image'], headers['user_name'], time_now, data['task_name']])
@@ -123,7 +129,7 @@ def submitTask():
 def addTask():
     with sql.connect("goodhuman.db") as con:
         cur = con.cursor()
-        data = request.get_json()
+        data = try_parse_json(request)
         headers = request.headers
         cur.execute("SELECT task_id FROM tasks ORDER BY task_id DESC")
         highest_id = cur.fetchone()
@@ -139,7 +145,7 @@ def addTask():
 def reviewTask():
     with sql.connect("goodhuman.db") as con:
         cur = con.cursor()
-        data = request.get_json()
+        data = try_parse_json(request)
         headers = request.headers
 
         match data['review']:
@@ -174,7 +180,7 @@ def getTask(task_id):
 def redeemReward():
     with sql.connect("goodhuman.db") as con:
         cur = con.cursor()
-        data = request.get_json()
+        data = try_parse_json(request)
         headers = request.headers
         time_now = datetime.now().strftime("%H:%M")
         cur.execute(f"UPDATE rewards SET user_name = ?, pending = 1, submit_time = ? WHERE reward_name ?", [headers['user_name'], time_now, data['reward_name']])
@@ -186,7 +192,7 @@ def redeemReward():
 def getPendingRewards():
     with sql.connect("goodhuman.db") as con:
         cur = con.cursor()
-        data = request.get_json()
+        data = try_parse_json(request)
         headers = request.headers
         cur.execute("SELECT user_name, reward_id, reward_name, submit_time FROM rewards WHERE pending = 1")
         pending_rewards = cur.fetchall()
