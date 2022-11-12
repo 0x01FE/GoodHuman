@@ -4,6 +4,7 @@ import sqlite3 as sql
 import json
 from datetime import datetime
 from random import random
+from camera import getImage
 
 # datetime.now().strftime("%H:%M")
 #DB = sqlite3.connect(DATABASE, check_same_thread=False)
@@ -18,6 +19,7 @@ def try_parse_json(req):
         return req.get_json()
     except Exception:
         return {}
+
 
 class Opener():
     def __init__(self, req):
@@ -64,8 +66,6 @@ def getMyGroups():
     with Opener(request) as (con, cur, data, headers):
         cur.execute("SELECT group_id FROM members WHERE user_name = ?", [headers['user-name']])
         db_data = cur.fetchone()
-        db_data = db_data.split(',')
-        db_data.pop(0)
         response = app.response_class(
             response=json.dumps({"group_id":db_data}),
             status=200,
@@ -110,7 +110,8 @@ def addUserCurrency(user_name,ammount):
 def submitTask():
     with Opener(request) as (con, cur, data, headers):
         time_now = datetime.now().strftime("%H:%M")
-        cur.execute("UPDATE tasks SET image = ?, user_name = ?, pending = 1, submit_time = ? WHERE task_name = ?", [data['image'], headers['user-name'], time_now, data['task-name']])
+        getImage(data['task-name'])
+        cur.execute("UPDATE tasks SET image = NULL, user_name = ?, pending = 1, submit_time = ? WHERE task_name = ?", [headers['user-name'], time_now, data['task-name']])
     return '', 204
 
 @app.route('/task/add', methods=['POST'])
