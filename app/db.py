@@ -9,6 +9,3 @@ CUR = DB.cursor()
 CUR.execute("CREATE TABLE rewards(reward_id INTEGER PRIMARY KEY NOT NULL, reward_name TEXT, description TEXT, points INTEGER, pending INTEGER, user_name TEXT, submit_time TEXT)")
 
 
-
-#CUR.execute("SELECT name FROM sqlite_master")
-#print(CUR.fetchall())
