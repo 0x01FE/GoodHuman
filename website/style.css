@@ -45,6 +45,13 @@ body {
     flex-direction: column;
     border-radius: 10px;
 }
+.taskHead {
+    text-align: center;
+}
+.taskElement {
+    width: 100%;
+    height: 50px;
+}
 
 .side_container_header,
 .containerFillVertical {

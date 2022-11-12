@@ -51,7 +51,7 @@ function createTaskElement(task) {
     elm.className = "taskElement";
     
     const head = document.createElement("h3");
-    head.className = "bigText";
+    head.className = "taskHead";
     head.innerHTML = task["task_name"]
     elm.appendChild(head);
 
