@@ -6,7 +6,7 @@ from datetime import datetime
 from random import random
 
 # datetime.now().strftime("%H:%M")
-#DB = sqlite3.connect("goodhuman.db", check_same_thread=False)
+#DB = sqlite3.connect(DATABASE, check_same_thread=False)
 #CUR = DB.cursor()
 
 app = Flask(__name__)
@@ -18,12 +18,21 @@ def try_parse_json(req):
     except Exception:
         return {}
 
+DATABASE = "goodhuman.db"
+
+
+class Opener():
+    def __init__(self, request):
+        self.req = request
+        self.con = sql.connect(DATABASE)
+    def __enter__(self):
+        return self.con, try_parse_json(self.req), req.headers
+    def __exit__(self, type, value, traceback):
+        self.con.close()
+
 @app.route('/members/add', methods=['POST'])
 def createUser():
-    with sql.connect("goodhuman.db") as con:
-        cur = con.cursor()
-        data = try_parse_json(request)
-        headers = request.headers
+    with Opener(DATABASE) as con, data, headers:
         cur.execute("SELECT * FROM members WHERE user_name = ?", [headers['user-name']])
         db_data = cur.fetchall()
         if not db_data:
@@ -39,7 +48,7 @@ def createUser():
 
 @app.route('/members/group', methods=['GET'])
 def getGroupIOwn():
-    with sql.connect("goodhuman.db") as con:
+    with sql.connect(DATABASE) as con:
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
@@ -56,7 +65,7 @@ def getGroupIOwn():
 
 @app.route('/members/allgroups', methods=['GET'])
 def getMyGroups():
-    with sql.connect("goodhuman.db") as con:
+    with sql.connect(DATABASE) as con:
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
@@ -74,7 +83,7 @@ def getMyGroups():
 
 @app.route('/members/joingroup', methods=['POST'])
 def joinGroup():
-    with sql.connect("goodhuman.db") as con:
+    with sql.connect(DATABASE) as con:
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
@@ -90,7 +99,7 @@ def joinGroup():
 
 @app.route('/currency/user', methods=['GET'])
 def getUserCurrency():
-    with sql.connect("goodhuman.db") as con:
+    with sql.connect(DATABASE) as con:
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
@@ -106,7 +115,7 @@ def getUserCurrency():
 
 @app.route('/currency/set', methods=['POST'])
 def setUserCurrency():
-    with sql.connect("goodhuman.db") as con:
+    with sql.connect(DATABASE) as con:
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
@@ -116,7 +125,7 @@ def setUserCurrency():
 
 # this is for local use (not an endpoint)
 def addUserCurrency(user_name,ammount):
-    with sql.connect("goodhuman.db") as con:
+    with sql.connect(DATABASE) as con:
         cur = con.cursor()
         cur.execute("SELECT currency_ammount FROM members WHERE user_name = ?", [user_name])
         new_points = int(cur.fetchone()) + ammount
@@ -127,7 +136,7 @@ def addUserCurrency(user_name,ammount):
 
 @app.route('/task/submit', methods=['POST'])
 def submitTask():
-    with sql.connect("goodhuman.db") as con:
+    with sql.connect(DATABASE) as con:
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
@@ -138,7 +147,7 @@ def submitTask():
 
 @app.route('/task/add', methods=['POST'])
 def addTask():
-    with sql.connect("goodhuman.db") as con:
+    with sql.connect(DATABASE) as con:
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
@@ -154,7 +163,7 @@ def addTask():
 '''
 @app.route("/task/review", methods=['POST'])
 def reviewTask():
-    with sql.connect("goodhuman.db") as con:
+    with sql.connect(DATABASE) as con:
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
@@ -173,7 +182,7 @@ def reviewTask():
     return '', 204
 '''
 def getTask(task_id):
-    with sql.connect("goodhuman.db") as con:
+    with sql.connect(DATABASE) as con:
         cur = con.cursor()
         cur.execute("SELECT * FROM tasks WHERE task_id = ?", [task_id])
         task = cur.fetchone()
@@ -189,7 +198,7 @@ def getTask(task_id):
 
 @app.route('/reward/redeem', methods=['POST'])
 def redeemReward():
-    with sql.connect("goodhuman.db") as con:
+    with sql.connect(DATABASE) as con:
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
@@ -201,7 +210,7 @@ def redeemReward():
 
 @app.route('/reward/pending', methods=['GET'])
 def getPendingRewards():
-    with sql.connect("goodhuman.db") as con:
+    with sql.connect(DATABASE) as con:
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
