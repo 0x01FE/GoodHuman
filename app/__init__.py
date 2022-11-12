@@ -23,7 +23,6 @@ def try_parse_json(req):
     except Exception:
         return {}
 
-
 class Opener():
     def __init__(self, req):
         self.con = sql.connect(DATABASE)
