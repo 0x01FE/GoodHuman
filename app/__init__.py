@@ -126,7 +126,7 @@ def addTask():
         cur.execute("INSERT INTO tasks VALUES (?, ?, NULL, ?, ?, ?, ?, ?, NULL, NULL, NULL)", [highest_id+1, data['task-name'], data['points'], data['type'], data['repeat'], data['time'], data['description']])
     return '', 204
 
-@app.route('/task/getall')
+@app.route('/getTasksFromGroupIBelong', methods=['GET', 'POST'])
 def getMyTasks():
     with Opener(request) as (con, cur, data, headers):
         tasks = [

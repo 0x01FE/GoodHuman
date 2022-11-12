@@ -21,8 +21,10 @@ function logInSignUp(type) {
     const passwordElm = document.getElementById("password");
     if(!checkWarnTextVal(passwordElm)) return;
     
-    const username = usernameElm.value;
-    const password = passwordElm.value;
+    username = usernameElm.value;
+    password = passwordElm.value;
+    
+    localStorage.setItem("user_name", username); localStorage.setItem("user_pass", password); // ????
     
     login(username, password);
 }
@@ -47,12 +49,13 @@ function createGroupButton() {
 }
 
 function createTaskElement(task) {
+    console.log(task);
     const elm = document.createElement("div");
     elm.className = "taskElement";
     
     const head = document.createElement("h3");
     head.className = "taskHead";
-    head.innerHTML = task["task_name"]
+    head.innerHTML = task["task_name"];
     elm.appendChild(head);
 
     for(const [k, v] of Object.Entries({
@@ -77,22 +80,22 @@ async function switchToUserScreen() {
     swap("login_gui", "user_panel");
     const myPoints  = await getMyPoints();
     const myTasks   = await getTasksFromGroupIBelong();
-    const myRewards = await getRewardsFromGroupIBelong();
+    // const myRewards = await getRewardsFromGroupIBelong();
+    // const rewards = getRewardsFromGroupIBelong(task);
+    // const reward_container = document.getElementById("reward_container");
+    // reward_container.children = []
+    // for(const reward of rewards) {
+        // task_container.appendChild(createRewardElement(reward));
+    // }
     
     const userInfoTextElm = document.getElementById("userInfoText");
     userInfoTextElm.innerHTML = `${username} - ${myPoints} points`;
     
     const tasks = getTaskFromGroupIBelong(task);
-    const rewards = getRewardsFromGroupIBelong(task);
     const task_container = document.getElementById("task_container");
-    const reward_container = document.getElementById("reward_container");
     
     task_container.children = []
-    reward_container.children = []
     for(const task of tasks) {
         task_container.appendChild(createTaskElement(task));
-    }
-    for(const reward of rewards) {
-        task_container.appendChild(createRewardElement(reward));
     }
 }
