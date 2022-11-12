@@ -24,7 +24,7 @@ def createUser():
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
-        cur.execute("SELECT * FROM members WHERE user_name = ?", headers['user_name'])
+        cur.execute("SELECT * FROM members WHERE user_name = ?", headers['user-name'])
         db_data = cur.fetchall()
         if not db_data:
             return '', 204
@@ -33,7 +33,7 @@ def createUser():
                 group = data['group_id']
             else:
                 group = str(random())
-            cur.execute("INSERT INTO members VALUES (?, ?, ?, NULL)", [headers['user_name'], headers['user_pass'], group])
+            cur.execute("INSERT INTO members VALUES (?, ?, ?, NULL)", [headers['user-name'], headers['user-pass'], group])
             con.commit()
             return '', 204
 
@@ -43,7 +43,7 @@ def getGroupIOwn():
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
-        cur.execute("SELECT group_id FROM members WHERE user_name = ?", [headers['user_name']])
+        cur.execute("SELECT group_id FROM members WHERE user_name = ?", [headers['user-name']])
         db_data = cur.fetchone()
         db_data = db_data.split(",")
         response = app.response_class(
@@ -60,7 +60,7 @@ def getMyGroups():
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
-        cur.execute("SELECT group_id FROM members WHERE user_name = ?", [headers['user_name']])
+        cur.execute("SELECT group_id FROM members WHERE user_name = ?", [headers['user-name']])
         db_data = cur.fetchone()
         db_data = db_data.split(',')
         db_data.pop(0)
@@ -80,7 +80,7 @@ def joinGroup():
         headers = request.headers
         db_data = cur.fetchone()
         db_data = db_data + f",{str(data['group_id'])}"
-        cur.execute("UPDATE members SET group_id = ? WHERE user_name = ?", [db_data, headers['user_name']])
+        cur.execute("UPDATE members SET group_id = ? WHERE user_name = ?", [db_data, headers['user-name']])
         con.commit()
     return '', 204
  
@@ -94,7 +94,7 @@ def getUserCurrency():
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
-        cur.execute("SELECT currency_ammount FROM members WHERE user_name = ?", [headers['user_name']])
+        cur.execute("SELECT currency_ammount FROM members WHERE user_name = ?", [headers['user-name']])
         currency = cur.fetchone()
         response = app.response_class(
             response=json.dumps({'points':currency}),
@@ -110,7 +110,7 @@ def setUserCurrency():
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
-        cur.execute("UPDATE members SET currency_ammount = ? WHERE user_name = ?", [data['points'], data['user_name']])
+        cur.execute("UPDATE members SET currency_ammount = ? WHERE user_name = ?", [data['points'], data['user-name']])
         con.commit()
     return '', 204
 
@@ -132,7 +132,7 @@ def submitTask():
         data = try_parse_json(request)
         headers = request.headers
         time_now = datetime.now().strftime("%H:%M")
-        cur.execute("UPDATE tasks SET image = ?, user_name = ?, pending = 1, submit_time = ? WHERE task_name = ?", [data['image'], headers['user_name'], time_now, data['task_name']])
+        cur.execute("UPDATE tasks SET image = ?, user_name = ?, pending = 1, submit_time = ? WHERE task_name = ?", [data['image'], headers['user-name'], time_now, data['task-name']])
         con.commit()
     return '', 204
 
@@ -148,7 +148,7 @@ def addTask():
             highest_id = 1
         else:    
             highest_id+=1
-        cur.execute("INSERT INTO tasks VALUES (?, ?, NULL, ?, ?, ?, ?, ?, NULL, NULL, NULL)", [highest_id+1, data['task_name'], data['points'], data['type'], data['repeat'], data['time'], data['description']])
+        cur.execute("INSERT INTO tasks VALUES (?, ?, NULL, ?, ?, ?, ?, ?, NULL, NULL, NULL)", [highest_id+1, data['task-name'], data['points'], data['type'], data['repeat'], data['time'], data['description']])
         con.commit()
     return '', 204
 '''
@@ -194,7 +194,7 @@ def redeemReward():
         data = try_parse_json(request)
         headers = request.headers
         time_now = datetime.now().strftime("%H:%M")
-        cur.execute(f"UPDATE rewards SET user_name = ?, pending = 1, submit_time = ? WHERE reward_name ?", [headers['user_name'], time_now, data['reward_name']])
+        cur.execute(f"UPDATE rewards SET user_name = ?, pending = 1, submit_time = ? WHERE reward_name ?", [headers['user-name'], time_now, data['reward-name']])
         con.commit()
     return '', 204
 
