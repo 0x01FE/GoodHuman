@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 import sqlite3 as sql
 import json
+import requests
+import base64
 from datetime import datetime
 from random import random
 from camera import getImage
@@ -10,6 +12,7 @@ from camera import getImage
 #DB = sqlite3.connect(DATABASE, check_same_thread=False)
 #CUR = DB.cursor()
 
+URL = "192.168.137.148:5001/image"
 DATABASE = "goodhuman.db"
 app = Flask(__name__)
 CORS(app)
@@ -150,6 +153,13 @@ def getPendingRewards():
             mimetype='application/json')
         response.headers['Access-Control-Allow-Origin'] = '*'
     return response
+
+def getImage(task_id):
+    r = requests.get(url = URL)
+    data = r.json()
+
+    with open(task_id+".png",'w+') as f:
+        f.write(base64.b64decode(data))
 
 
 '''
