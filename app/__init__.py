@@ -3,6 +3,7 @@ from flask_cors import CORS
 import sqlite3 as sql
 import json
 from datetime import datetime
+from random import random
 
 # datetime.now().strftime("%H:%M")
 #DB = sqlite3.connect("goodhuman.db", check_same_thread=False)
@@ -28,7 +29,11 @@ def createUser():
         if not db_data:
             return '', 204
         else:
-            cur.execute("INSERT INTO members VALUES (?, ?, ?, NULL)", [headers['user_name'], headers['user_pass'], data['group_id']])
+            if 'group_id' in data:
+                group = data['group_id']
+            else:
+                group = str(random())
+            cur.execute("INSERT INTO members VALUES (?, ?, ?, NULL)", [headers['user_name'], headers['user_pass'], group])
             con.commit()
             return '', 204
 
