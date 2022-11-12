@@ -78,9 +78,7 @@ def getMyGroups():
 @app.route('/members/joingroup', methods=['POST'])
 def joinGroup():
     with Opener(request) as (con, cur, data, headers):
-        db_data = cur.fetchone()
-        db_data = db_data + f",{str(data['group_id'])}"
-        cur.execute("UPDATE members SET group_id = ? WHERE user_name = ?", [db_data, headers['user-name']])
+        cur.execute("UPDATE members SET group_id = ? WHERE user_name = ?", [data["group-id"], headers['user-name']])
     return '', 204
  
 @app.route('/currency/user', methods=['GET'])
@@ -128,11 +126,45 @@ def addTask():
         cur.execute("INSERT INTO tasks VALUES (?, ?, NULL, ?, ?, ?, ?, ?, NULL, NULL, NULL)", [highest_id+1, data['task-name'], data['points'], data['type'], data['repeat'], data['time'], data['description']])
     return '', 204
 
+@app.route('/task/getall')
+def getMyTasks():
+    with Opener(request) as (con, cur, data, headers):
+        tasks = [
+            {
+                "task_name" : "Do the Laundry",
+                "description" : "Please do the laundry before 2:30 today",
+                "time": "02:30",
+                "points": 10
+            },
+            {
+                "task_name" : "Clean the kitchen",
+                "description" : "Please clean the kitchen for some extra rewards today!",
+                "time": "05:30",
+                "points": 50
+            },
+            {
+                "task_name" : "Dust the shelves",
+                "description" : "dust duST there Is SO mcuH DUST ON THE SHELVEs please Remove THE DUST",
+                "time": "-2:30",
+                "points": 237182
+            }
+        ]
+        response = app.response_class(
+            response=json.dumps(tasks),
+            status=200,
+            mimetype='application/json')
+        response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+
 def getTask(task_id):
     with Opener(request) as (con, cur, data, headers):
         cur.execute("SELECT * FROM tasks WHERE task_id = ?", [task_id])
         task = cur.fetchone()
     return task
+
+
 
 @app.route('/reward/redeem', methods=['POST'])
 def redeemReward():
