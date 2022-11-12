@@ -29,7 +29,13 @@ def getGroupIOwn():
         headers = request.headers
         cur.execute("SELECT group_id WHERE user_name = ?", [headers['user_name']])
         db_data = cur.fetchone().split(',')
-    return jsonify({"group_id":str(db_data[0])}), 200
+        response = app.response_class(
+            response=json.dumps({"group_id":str(db_data[0])}),
+            status=200,
+            mimetype='application/json'
+        )
+        response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 @app.route('/members/allgroups', methods=['GET'])
 def getMyGroups():
@@ -40,7 +46,13 @@ def getMyGroups():
         cur.execute("SELECT group_id WHERE user_name = ?", [headers['user_name']])
         db_data = cur.fetchone().split(',')
         db_data.pop(0)
-    return jsonify({"group_id":db_data}), 200
+        response = app.response_class(
+            response=json.dumps({"group_id":db_data}),
+            status=200,
+            mimetype='application/json'
+        )
+        response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 @app.route('/members/joingroup', methods=['POST'])
 def joinGroup():
@@ -67,7 +79,13 @@ def getUserCurrency():
         headers = request.headers
         cur.execute("SELECT currency_ammount FROM members WHERE user_name = ?", [headers['user_name']])
         currency = cur.fetchone()
-    return jsonify({'points':currency}), 200
+        response = app.response_class(
+            response=json.dumps({'points':currency}),
+            status=200,
+            mimetype='application/json'
+        )
+        response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 @app.route('/currency/set', methods=['POST'])
 def setUserCurrency():
@@ -75,11 +93,18 @@ def setUserCurrency():
         cur = con.cursor()
         data = request.get_json()
         headers = request.headers
-        cur.execute("UPDATE members SET currency_ammount = ? WHERE user_name = ?", [headers['points'], headers['user_name']])
+        cur.execute("UPDATE members SET currency_ammount = ? WHERE user_name = ?", [data['points'], data['user_name']])
         con.commit()
     return '', 204
 
-
+# this is for local use (not an endpoint)
+def addUserCurrency(user_name,ammount):
+    with sql.connect("goodhuman.db") as con:
+        cur = con.cursor()
+        cur.execute("SELECT currency_ammount FROM members WHERE user_name = ?", [user_name])
+        new_points = int(cur.fetchone()) + ammount
+        cur.execute("UPDATE members SET currency_ammount = ? WHERE user_name = ?", [new_points, user_name])
+        con.commit()
 
 # TASKS
 
@@ -101,13 +126,42 @@ def addTask():
         data = request.get_json()
         headers = request.headers
         cur.execute("SELECT task_id FROM tasks ORDER BY task_id DESC")
-        highest_id = int(cur.fetchone())
-        cur.execute("INSERT INTO tasks VALUE (?, ?, NULL, ?, ?, ?, ?, ?, NULL, NULL)", [highest_id+1, data['task_name'], data['points'], data['type'], data['repeat'], data['time'], data['description']])
+        highest_id = cur.fetchone()
+        if not highest_id:
+            highest_id = 1
+        else:    
+            highest_id+=1
+        cur.execute("INSERT INTO tasks VALUES (?, ?, NULL, ?, ?, ?, ?, ?, NULL, NULL, NULL)", [highest_id+1, data['task_name'], data['points'], data['type'], data['repeat'], data['time'], data['description']])
         con.commit()
     return '', 204
+'''
+@app.route("/task/review", methods=['POST'])
+def reviewTask():
+    with sql.connect("goodhuman.db") as con:
+        cur = con.cursor()
+        data = request.get_json()
+        headers = request.headers
 
+        match data['review']:
+            # Give points,remove task
+            case 'accept':
+                task = getTask(headers['task_id'])
+                addUserCurrency(task[''])
 
+            # Go turn off pending remove user
+            case 'redo':
 
+            # remove task, 
+            case 'deny':
+    return '', 204
+'''
+def getTask(task_id):
+    with sql.connect("goodhuman.db") as con:
+        cur = con.cursor()
+        cur.execute("SELECT * FROM tasks WHERE task_id = ?", [task_id])
+        task = cur.fetchone()
+        print(task)
+        return task
 
 
 
@@ -136,9 +190,17 @@ def getPendingRewards():
         headers = request.headers
         cur.execute("SELECT user_name, reward_id, reward_name, submit_time FROM rewards WHERE pending = 1")
         pending_rewards = cur.fetchall()
-    return jsonify({"pending_rewards":pending_rewards})
+        response = app.response_class(
+            response=json.dumps({"pending_rewards":pending_rewards}),
+            status=200,
+            mimetype='application/json'
+        )
+        response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 
+
+        
 
 
 
