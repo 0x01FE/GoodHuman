@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>GoodHuman</title>
+        <link href="/style.css" rel="stylesheet" type="text/css">
+        <script src="/API.js"></script>
+        <script src="/utils.js"></script>
+        <script src="./pageScript.js"></script>
+    </head>
+    <body>
+        <img class="header_image" src="./goodHumanHeader.png">
+        <div id="login_gui" class="swappable main_container">
+            <div class="centerer centered_contained" style="width: 50%">
+                <div id="loginScreen" class="swappable">
+                    <div class="mini_sep">
+                        <input id="username" class="text_input" placeholder="Username">
+                        <input id="password" type="password" class="text_input"  placeholder="Password">
+                    </div>
+                    <div class="mini_sep">
+                        <button id="SignIn" class="big_button" onclick="logInSignUp('signIn')">Sign in</button>
+                        <button id="SignUp" class="big_button" onclick="logInSignUp('logIn')">Sign up</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="groupJoinScreen" class="swappable HIDDEN">
+            <div class="mini_sep">
+                <input id="groupID" class="text_input" placeholder="Group ID">
+            </div>
+            <div class="mini_sep">
+                <button class="big_button" onclick="joinGroupButton()">Join Group</button>
+                <button class="big_button" onclick="createGroupButton()">Create Group</button>
+            </div>
+        </div>
+        
+        <div id="user_panel" class="swappable main_container HIDDEN">
+            <h3 id="userInfoText"></h3>
+            <div style="display:flex;flex-direction:row;padding-top:100px;height:Calc(100% - 120px)">
+                <span class="half_container" style="margin-right: auto;">
+                    <div class="side_container_header">
+                        <h3>Tasks</h3>
+                    </div>
+                    <div id="task_container" class="containerFillVertical">
+                        
+                    </div>
+                </span>
+                <span class="half_container" style="margin-left: auto;">
+                    <div class="side_container_header">
+                        <h3>Rewards</h3>
+                    </div>
+                    <div id="reward_container" class="containerFillVertical">
+                        
+                    </div>
+                </span>
+            </div>
+        </div>
+        
+    </body>
+</html>
