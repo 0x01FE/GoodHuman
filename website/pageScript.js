@@ -48,7 +48,22 @@ function createGroupButton() {
 
 function createTaskElement(task) {
     const elm = document.createElement("div");
-    // add task properties to div
+    elm.className = "taskElement";
+    
+    const head = document.createElement("h3");
+    head.className = "bigText";
+    head.innerHTML = task["task_name"]
+    elm.appendChild(head);
+
+    for(const [k, v] of Object.Entries({
+        "Points": task['points'],
+        "Time": task['time'],
+        "Description": task["description"]
+    })) {
+        const t = document.createElement("h6");
+        t.innerHTML = `${k}: ${v}`;
+        elm.appendChild(t);
+    }
     return elm;
 }
 function createRewardElement(reward) {
