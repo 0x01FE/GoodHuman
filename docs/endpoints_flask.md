@@ -2,7 +2,7 @@
 
 note that there might be more headers being sent to the endpoint but i only put the ones i'm actually using in the backend
 
-## Members
+# Members
 
 ### /members/add
 type : POST
@@ -45,8 +45,7 @@ return 204
 
 
 
-
-## Currency
+# Currency
 
 ### /currency/user
 type : GET
@@ -65,6 +64,51 @@ payload : {
 
 return 204
 
+
+
+# TASKS
+
+### /task/submit
+type : POST
+headers : {
+    user_name : str,
+}
+payload : {
+    task_name : str,
+    image : str
+}
+I'm assuming the image will be a str of b64 bytes
+
+return 204
+
+### /task/add
+type : POST
+payload : {
+    task_name : str,
+    points : int,
+    type : str,
+    repeat : str,
+    time : str,
+    description : str,
+}
+type ∈ {"one off", "repeat"}
+repeat ∈ {"daily", "weekly"}
+
+return 204
+
+
+# REWARDS
+
+### /reward/redeem
+type : POST
+headers : {
+    user_name : str
+}
+payload : {
+    reward_name : str
+}
+
+return 204
 
 
 
