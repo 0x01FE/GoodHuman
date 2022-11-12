@@ -24,7 +24,7 @@ def createUser():
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
-        cur.execute("SELECT * FROM members WHERE user_name = ?", headers['user-name'])
+        cur.execute("SELECT * FROM members WHERE user_name = ?", [headers['user-name']])
         db_data = cur.fetchall()
         if not db_data:
             return '', 204
