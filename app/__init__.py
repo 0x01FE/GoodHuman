@@ -41,7 +41,7 @@ def createUser():
     with Opener(request) as (con, cur, data, headers):
         cur.execute("SELECT * FROM members WHERE user_name = ?", [headers['user-name']])
         db_data = cur.fetchall()
-        if not db_data:
+        if db_data:
             return '', 204
         else:
             if 'group_id' in data:

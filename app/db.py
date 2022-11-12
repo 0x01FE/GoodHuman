@@ -6,7 +6,7 @@ CUR = DB.cursor()
 
 #CUR.execute("DROP TABLE rewards")
 #CUR.execute("DROP TABLE tasks")
-CUR.execute("SELECT group_id FROM members")
+CUR.execute("SELECT * FROM members")
 print(CUR.fetchall())
 
 
