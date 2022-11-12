@@ -53,17 +53,17 @@ function createTaskElement(task) {
     const elm = document.createElement("div");
     elm.className = "taskElement";
     
-    const head = document.createElement("h3");
+    const head = document.createElement("h2");
     head.className = "taskHead";
     head.innerHTML = task["task_name"];
     elm.appendChild(head);
 
-    for(const [k, v] of Object.Entries({
+    for(const [k, v] of Object.entries({
         "Points": task['points'],
         "Time": task['time'],
         "Description": task["description"]
     })) {
-        const t = document.createElement("h6");
+        const t = document.createElement("h5");
         t.innerHTML = `${k}: ${v}`;
         elm.appendChild(t);
     }
@@ -91,11 +91,10 @@ async function switchToUserScreen() {
     const userInfoTextElm = document.getElementById("userInfoText");
     userInfoTextElm.innerHTML = `${username} - ${myPoints} points`;
     
-    const tasks = getTaskFromGroupIBelong(task);
     const task_container = document.getElementById("task_container");
     
     task_container.children = []
-    for(const task of tasks) {
+    for(const task of myTasks) {
         task_container.appendChild(createTaskElement(task));
     }
 }
