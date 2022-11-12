@@ -24,8 +24,7 @@ class Opener():
         self.con = sql.connect(DATABASE)
         self.req = req
     def __enter__(self):
-        print(f"""Request [{self.req.headers['user-name']}] 🠒 {self.req.path}: \
-            {try_parse_json(self.req)}""")
+        print(f"""Request [{self.req.headers['user-name']}] 🠒 {self.req.path}: {try_parse_json(self.req)}""")
         
         return self.con, self.con.cursor(), try_parse_json(self.req), self.req.headers
     def __exit__(self, type, value, traceback):
