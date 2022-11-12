@@ -6,7 +6,7 @@ import requests
 import base64
 from datetime import datetime
 from random import random
-from camera import getImage
+
 
 # datetime.now().strftime("%H:%M")
 #DB = sqlite3.connect(DATABASE, check_same_thread=False)
