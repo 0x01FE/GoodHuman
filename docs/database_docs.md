@@ -11,7 +11,7 @@ currency_ammount INTEGER
 ## Tasks
 
 task_id INTEGER PRIMARY KEY NOT NULL
-tas_name TEXT
+task_name TEXT
 user_name TEXT
 reward INTEGER <- amount of GBP
 type TEXT
