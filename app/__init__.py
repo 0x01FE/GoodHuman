@@ -23,9 +23,14 @@ def createUser():
         cur = con.cursor()
         data = try_parse_json(request)
         headers = request.headers
-        cur.execute("INSERT INTO members VALUES (?, ?, ?, NULL)", [headers['user_name'], headers['user_pass'], data['group_id']])
-        con.commit()
-    return '', 204
+        cur.execute("SELECT * FROM members WHERE user_name = ?", headers['user_name'])
+        db_data = cur.fetchall()
+        if not db_data:
+            return '', 204
+        else:
+            cur.execute("INSERT INTO members VALUES (?, ?, ?, NULL)", [headers['user_name'], headers['user_pass'], data['group_id']])
+            con.commit()
+            return '', 204
 
 @app.route('/members/group', methods=['GET'])
 def getGroupIOwn():
