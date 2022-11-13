@@ -1,16 +1,9 @@
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
 import sqlite3 as sql
-import json
-import requests
-import base64
+import json, requests, base64
 from datetime import datetime
 from random import random
-
-
-# datetime.now().strftime("%H:%M")
-#DB = sqlite3.connect(DATABASE, check_same_thread=False)
-#CUR = DB.cursor()
 
 URL = "192.168.137.148:5001/image"
 DATABASE = "goodhuman.db"
@@ -156,15 +149,11 @@ def getMyTasks():
         response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
-
-
 def getTask(task_id):
     with Opener(request) as (con, cur, data, headers):
         cur.execute("SELECT * FROM tasks WHERE task_id = ?", [task_id])
         task = cur.fetchone()
     return task
-
-
 
 @app.route('/reward/redeem', methods=['POST'])
 def redeemReward():

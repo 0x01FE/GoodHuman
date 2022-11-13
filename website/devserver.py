@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 try:
-    from http import server # Python 3
+    from http import server
 except ImportError:
-    import SimpleHTTPServer as server # Python 2
+    import SimpleHTTPServer as server
 
 class MyHTTPRequestHandler(server.SimpleHTTPRequestHandler):
     def end_headers(self):

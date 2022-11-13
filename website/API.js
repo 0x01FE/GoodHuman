@@ -1,6 +1,5 @@
 // const host = window.location.protocol + "//" + window.location.host + "/";
 const host = "http://127.0.0.1:5000/";
-
 var user_name = null;
 var user_pass = null;
 
@@ -9,16 +8,17 @@ window.onload = () => {
     user_pass = localStorage.getItem("user_pass");
     if(user_name && user_pass) login(user_name, user_pass)
 }
-function isLoggedIn() {
-    return (user_name && user_pass);
-}
-function login(user_name, user_pass) {
+
+var isLoggedIn = () => (user_name && user_pass);
+
+var login = (user_name, user_pass) => {
     createUser().then(() => {
         localStorage.setItem("user_name", user_name);
         localStorage.setItem("user_pass", user_pass);
     }).catch(err => console.log("Error creating/logging in user!", err));
 }
-function getHttp(path, headers) {
+
+var getHttp = (path, headers) => {
     console.log("GETTING!", path, headers);
     return new Promise(async (resolve, reject) => {
         if (!headers) {
@@ -39,21 +39,17 @@ function getHttp(path, headers) {
             resolve(data);
         }).catch(error => {
             console.log("NO JSON :(")
-            resolve({})
-            // reject(error);
+            reject(error);
         })
     })
 }
 
-function postHttp(path, body, headers) {
+var postHttp = (path, body, headers) => {
     console.log("POSTING!", path, body, headers);
     return new Promise(async (resolve, reject) => {
-        if (!headers) {
-            headers = {}
-        }
+        if (!headers) headers = {};
         headers.Accept = 'application/json';
         headers['Content-Type'] = 'application/json';
-        headers['Access-Control-Allow-Origin'] = '*'
         headers.user_name = user_name;
         headers.user_pass = user_pass;
         
@@ -67,100 +63,63 @@ function postHttp(path, body, headers) {
             resolve(data);
         }).catch(error => {
             console.log("NO JSON :(");
-            resolve({});
-            // reject(error);
+            reject(error);
         })
     })
 }
 
-function hashPassword(pass) {
-    return pass;
-}
-function createUser() {
+var hashPassword = (pass) => pass;
+
+var createUser = () => {
     return new Promise(async (resolve, reject) => {
         res = await postHttp("members/add", {});
-        if (res.group_id) {
-            resolve(res.group_id);
-        } else {
-            reject(res);
-        }
+        res.group_id ? resolve(res.group_id) : reject(res);
     });   
 }
 
-function joinGroup(group_id) {
+var joinGroup = (group_id) => {
     return new Promise(async (resolve, reject) => {
-        res = await postHttp("members/joingroup", {
-            group_id: group_id,
-        });
-        if (!res.error) {
-            resolve(res);
-        } else {
-            reject(res);
-        }
-    })
+        res = await postHttp("members/joingroup", { group_id: group_id });
+        res.error ? reject(res) : resolve(res);
+    });
 }
 
-function getGroupIOwn() {
+var getGroupIOwn = () => {
     return new Promise(async (resolve, reject) => {
         res = await getHttp("members/group");
-        if (res.group_id) {
-            resolve(res.group_id)
-        } else {
-            reject(res);
-        }
-    })
+        res.group_id ? resolve(res.group_id) : reject(res);
+    });
 }
 
-function getGroupIBelongTo() {
+var getGroupIBelongTo = () => {
     return new Promise(async (resolve, reject) => {
         res = await getHttp("members/allgroups")
-        if (res.group_id) {
-            resolve(res.group_id);
-        } else {
-            reject(res);
-        }
-    })
+        res.group_id ? resolve(res.group_id) : reject(res);
+    });
 }
 
-function getMyPoints() {
+var getMyPoints = () => {
     return new Promise(async (resolve, reject) => {
         res = await getHttp("currency/user");
-        if (res.points) {
-            resolve(res.points);
-        } else {
-            reject(res);
-        }
-    })
+        res.points ? resolve(res.points) : reject(res);
+    });
 }
 
-function setUserPoints(user_name, points) {
+var setUserPoints = (user_name, points) => {
     return new Promise(async (resolve, reject) => {
-        res = await postHttp("currency/set", {
-            user_name: user_name,
-            points: points,
-        });
-        if (!res.error) {
-            resolve(res);
-        } else {
-            reject(res);
-        }
-    })
+        res = await postHttp("currency/set", { user_name: user_name, points: points });
+        res.error ? reject(res) : resolve(res);
+    });
 }
 
-function redeemReward(taskName) {
+var redeemReward = (taskName) => {
     return new Promise(async (resolve, reject) => {
-        res = await postHttp("task/submit", {
-            reward_name: taskName,
-        });
-        if (!res.error) {
-            resolve(res);
-        } else {
-            reject(res);
-        }
-    })
+        res = await postHttp("task/submit", { reward_name: taskName });
+        res.error ? reject(res) : resolve(res);
+    });
 }
 
-function addTask(taskName, description, time, points, repeat) {
+var addTask = (taskName, description, time, points, repeat) => {
     return new Promise(async (resolve, reject) => {
         let postBody = {
             task_name: taskName,
@@ -174,161 +133,104 @@ function addTask(taskName, description, time, points, repeat) {
             postBody.repeat = repeat;
         }
         res = await postHttp("task/add",postBody);
-        if (!res.error) {
-            resolve(res);
-        } else {
-            reject(res);
-        }
-    })
+        res.error ? reject(res) : resolve(res);
+    });
 }
 
-function getUserSubmittedRewards() {
+var getUserSubmittedRewards = () => {
     return new Promise(async (resolve, reject) => {
         res = await getHttp("getUserSubmittedRewards");
-        if (!res.error) {
-            resolve(res);
-        } else {
-            reject(res);
-        }
-    })
+        res.error ? reject(res) : resolve(res);
+    });
 }
 
-function reviewUserSubmittedTask(review, task_id) {
+var reviewUserSubmittedTask = (review, task_id) => {
     return new Promise(async (resolve, reject) => {
-        res = await postHttp("reviewUserSubmittedTask", {
-            review: review,
-        }, {task_id: task_id});
-        if (!res.error) {
-            resolve(res);
-        } else {
-            reject(res);
-        }
-    })
+        res = await postHttp("reviewUserSubmittedTask",
+            { review: review }, 
+            { task_id: task_id });
+        res.error ? reject(res) : resolve(res);
+    });
 }
 
-function getTaskFromGroupIOwn(task) {
+var getTaskFromGroupIOwn = (task) => {
     return new Promise(async (resolve, reject) => {
         res = await getHttp("getTaskFromGroupIOwn", {task_name: task});
-        if (!res.error) {
-            resolve(res);
-        } else {
-            reject(res);
-        }
-    })
+        res.error ? reject(res) : resolve(res);
+    });
 }
 
-function getTaskFromGroupIBelong(task) {
+var getTaskFromGroupIBelong = (task) => {
     return new Promise(async (resolve, reject) => {
         res = await getHttp("getTaskFromGroupIBelong", {task_name: task});
-        if (!res.error) {
-            resolve(res);
-        } else {
-            reject(res);
-        }
-    })
+        res.error ? reject(res) : resolve(res);
+    });
 }
 
-function getTasksFromGroupIOwn() {
+var getTasksFromGroupIOwn = () => {
     return new Promise(async (resolve, reject) => {
         res = await getHttp("getTasksFromGroupIOwn");
-        if (!res.error) {
-            resolve(res);
-        } else {
-            reject(res);
-        }
-    })
+        res.error ? reject(res) : resolve(res);
+    });
 }
 
-function getTasksFromGroupIBelong() {
+var getTasksFromGroupIBelong = () => {
     return new Promise(async (resolve, reject) => {
         res = await getHttp("getTasksFromGroupIBelong");
-        if (!res.error) {
-            resolve(res);
-        } else {
-            reject(res);
-        }
-    })
+        res.error ? reject(res) : resolve(res);
+    });
 }
 
-function addRewards(rewardName, description, points) {
+var addRewards = (rewardName, description, points) => {
     return new Promise(async (resolve, reject) => {
         res = await postHttp("addReward", {
             reward_name: rewardName,
             description: description,
-            points: points,
-        });
-        if (!res.error) {
-            resolve(res);
-        } else {
-            reject(res);
-        }
-    })
+            points: points });
+        res.error ? reject(res) : resolve(res);
+    });
 }
 
-function getUserSubmittedTasks() {
+var getUserSubmittedTasks = () => {
     return new Promise(async (resolve, reject) => {
         res = await getHttp("getUserSubmittedTasks");
-        if (!res.error) {
-            resolve(res);
-        } else {
-            reject(res);
-        }
-    })
+        res.error ? reject(res) : resolve(res);
+    });
 }
 
-function reviewUserSubmittedReward(review, task_id) {
+var reviewUserSubmittedReward = (review, task_id) => {
     return new Promise(async (resolve, reject) => {
-        res = await postHttp("reviewUserSubmittedReward", {
-            review: review,
-        }, {task_id: task_id});
-        if (!res.error) {
-            resolve(res);
-        } else {
-            reject(res);
-        }
-    })
+        res = await postHttp("reviewUserSubmittedReward",
+            { review: review },
+            {task_id: task_id});
+        res.error ? reject(res) : resolve(res);
+    });
 }
 
-function getRewardFromGroupIOwn(reward_id) {
+var getRewardFromGroupIOwn = (reward_id) => {
     return new Promise(async (resolve, reject) => {
         res = await getHttp("getRewardFromGroupIOwn", {reward_id: reward_id});
-        if (!res.error) {
-            resolve(res);
-        } else {
-            reject(res);
-        }
-    })
+        res.error ? reject(res) : resolve(res);
+    });
 }
 
-function getRewardFromGroupIBelong(reward_id) {
+var getRewardFromGroupIBelong = (reward_id) => {
     return new Promise(async (resolve, reject) => {
         res = await getHttp("getRewardFromGroupIBelong", {reward_id: reward_id});
-        if (!res.error) {
-            resolve(res);
-        } else {
-            reject(res);
-        }
-    })
+        res.error ? reject(res) : resolve(res);
+    });
 }
 
-function getRewardsFromGroupIOwn() {
+var getRewardsFromGroupIOwn = () => {
     return new Promise(async (resolve, reject) => {
         res = await getHttp("getRewardsFromGroupIOwn");
-        if (!res.error) {
-            resolve(res);
-        } else {
-            reject(res);
-        }
-    })
+        res.error ? reject(res) : resolve(res);
+    });
 }
 
-function getRewardsFromGroupIBelong() {
+var getRewardsFromGroupIBelong = () => {
     return new Promise(async (resolve, reject) => {
         res = await getHttp("getRewardsFromGroupIBelong");
-        if (!res.error) {
-            resolve(res);
-        } else {
-            reject(res);
-        }
-    })
+        res.error ? reject(res) : resolve(res);
+    });
 }

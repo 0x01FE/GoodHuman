@@ -1,9 +1,7 @@
 prev = window.onload();
 window.onload = () => {
     prev && prev();
-    if(isLoggedIn()) {
-        checkGroupMembership();
-    }
+    if(isLoggedIn()) checkGroupMembership();
 }
 
 function checkGroupMembership() {
