@@ -181,7 +181,6 @@ def getImage(task_id):
     with open(task_id+".png",'w+') as f:
         f.write(base64.b64decode(data))
 
-
 '''
 @app.route("/task/review", methods=['POST'])
 def reviewTask():
